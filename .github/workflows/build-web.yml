@@ -1,0 +1,69 @@
+name: build-web
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PUBSPEC: "pubspec.yaml"
+  TARGET: "web"
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - ".github/workflows/build-web.yml"
+      - "lib/main.dart"
+      - "pubspec.yaml"
+
+jobs:
+  pre:
+    runs-on: ubuntu-24.04
+    outputs:
+      pubspec: ${{ env.PUBSPEC }}
+      target: ${{ env.TARGET }}
+    steps:
+      - run: echo "Bypass GitHub Action Restriction"
+
+  ready:
+    needs:
+      - pre
+    uses: LaoWangFantasy/Flutter-Actions/.github/workflows/get-version.yml@master
+    with:
+      pub_path: ${{ needs.pre.outputs.pubspec }}
+
+  build-web:
+    runs-on: ubuntu-24.04
+    needs:
+      - pre
+      - ready
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Flutter
+        uses: subosito/flutter-action@v2.18.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+      -
+        run: flutter --version
+      -
+        run: flutter pub get
+      -
+        run: flutter test
+      -
+        run: flutter build web
+      - 
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+          PREFIX="${{ needs.pre.outputs.target }}"
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}.tar.gz"
+          ls -al build
+          cd build && zip -r $BIN $PREFIX
+          gh release upload ${{ needs.ready.outputs.version }} $BIN
+        shell: bash
+        name: Upload

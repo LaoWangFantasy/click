@@ -1,0 +1,81 @@
+name: build-zip
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PUBSPEC: "pubspec.yaml"
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - ".github/workflows/build-zip.yml"
+      - "lib/main.dart"
+      - "pubspec.yaml"
+
+jobs:
+  pre:
+    runs-on: ubuntu-24.04
+    outputs:
+      pubspec: ${{ env.PUBSPEC }}
+    steps:
+      - run: echo "Bypass GitHub Action Restriction"
+
+  ready:
+    needs:
+      - pre
+    uses: LaoWangFantasy/Flutter-Actions/.github/workflows/get-version.yml@master
+    with:
+      pub_path: ${{ needs.pre.outputs.pubspec }}
+
+  build-zip:
+    runs-on: macos-latest
+    needs:
+      - pre
+      - ready
+    strategy:
+      matrix:
+        target: [macos, app, ios]
+        include:
+          - target: macos
+            build: "build macos --release"
+          - target: app
+            build: "build apk --release"
+          - target: ios
+            build: "build ipa --release --no-codesign"
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Flutter
+        uses: subosito/flutter-action@v2.18.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+      -
+        run: flutter --version
+      -
+        run: flutter pub get
+      -
+        run: flutter test
+      - 
+        name: Build for ${{ matrix.target }}
+        run:
+          flutter ${{ matrix.build }}
+        shell: bash
+      - 
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+          PREFIX="${{ matrix.target }}"
+          BIN="$REPO_NAME-${{ matrix.target }}.zip"
+          ls -al build
+          cd build && zip -r $BIN $PREFIX
+          gh release upload ${{ needs.ready.outputs.version }} $BIN
+        shell: bash
+        name: Upload

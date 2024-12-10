@@ -1,0 +1,72 @@
+name: build-windows
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PUBSPEC: "pubspec.yaml"
+  TARGET: "windows"
+  RELEASE: "build/windows/x64/runner/Release/atom.exe"
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - ".github/workflows/build-windows.yml"
+      - "lib/main.dart"
+      - "pubspec.yaml"
+
+jobs:
+  pre:
+    runs-on: ubuntu-24.04
+    outputs:
+      pubspec: ${{ env.PUBSPEC }}
+      target: ${{ env.TARGET }}
+      release: ${{ env.RELEASE }}
+    steps:
+      - run: echo "Bypass GitHub Action Restriction"
+
+  ready:
+    needs:
+      - pre
+    uses: LaoWangFantasy/Flutter-Actions/.github/workflows/get-version.yml@master
+    with:
+      pub_path: ${{ needs.pre.outputs.pubspec }}
+
+  build-windows:
+    runs-on: windows-latest
+    needs:
+      - pre
+      - ready
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Flutter
+        uses: subosito/flutter-action@v2.18.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+      -
+        run: flutter --version
+      -
+        run: flutter pub get
+      -
+        run: flutter test
+      -
+        run: flutter build windows
+      -
+        run: |
+          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
+          $prefix = "${{ needs.pre.outputs.release }}"
+          $extension = $prefix -replace '^.*\.', ''
+          $bin= "$repoName-${{ needs.pre.outputs.target }}.$extension"
+          
+          Move-Item -Path "build/windows/x64/runner/Release/atom.exe" -Destination $bin
+          gh release upload ${{ needs.ready.outputs.version }} $bin
+        shell: pwsh
+        name: Upload(windows)
