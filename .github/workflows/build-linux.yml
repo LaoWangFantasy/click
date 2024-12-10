@@ -63,7 +63,7 @@ jobs:
       -
         run: flutter test
       -
-        run: flutter build linux
+        run: flutter build ${{ needs.pre.outputs.target }}
       - 
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"

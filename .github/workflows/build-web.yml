@@ -4,6 +4,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "web"
+  RELEASE: "build/web"
 
 permissions:
   contents: write
@@ -26,6 +27,7 @@ jobs:
     outputs:
       pubspec: ${{ env.PUBSPEC }}
       target: ${{ env.TARGET }}
+      release: ${{ env.RELEASE }}
     steps:
       - run: echo "Bypass GitHub Action Restriction"
 
@@ -58,13 +60,14 @@ jobs:
       -
         run: flutter test
       -
-        run: flutter build web
+        run: flutter build ${{ needs.pre.outputs.target }}
       - 
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
-          PREFIX="${{ needs.pre.outputs.target }}"
+          PREFIX="${{ needs.pre.outputs.release }}"
           BIN="$REPO_NAME-${{ needs.pre.outputs.target }}.zip"
-          cd build && zip -r $BIN $PREFIX
+          
+          cd $PREFIX && zip -r $BIN ./*
           gh release upload ${{ needs.ready.outputs.version }} $BIN
         shell: bash
         name: Upload
