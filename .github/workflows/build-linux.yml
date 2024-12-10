@@ -11,13 +11,15 @@ permissions:
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["ci"]
+    types:
+      - completed
   push:
     branches:
       - "master"
     paths:
       - ".github/workflows/build-linux.yml"
-      - "lib/main.dart"
-      - "pubspec.yaml"
 
 jobs:
   pre:
