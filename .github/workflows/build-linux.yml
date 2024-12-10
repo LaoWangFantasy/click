@@ -38,6 +38,44 @@ jobs:
     with:
       pub_path: ${{ needs.pre.outputs.pubspec }}
 
+  build-linux-legacy:
+    runs-on: ubuntu-20.04
+    needs:
+      - pre
+      - ready
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Flutter
+        uses: subosito/flutter-action@v2.18.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+      - 
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build libgtk-3-dev
+      -
+        run: flutter --version
+      -
+        run: flutter pub get
+      -
+        run: flutter test
+      -
+        run: flutter build ${{ needs.pre.outputs.target }}
+      - 
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+          PREFIX="${{ needs.pre.outputs.release }}"
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy.zip"
+          
+          cd $PREFIX && zip -r $BIN ./*
+          gh release upload ${{ needs.ready.outputs.version }} $BIN
+        shell: bash
+        name: Upload
+
   build-linux:
     runs-on: ubuntu-22.04
     needs:
@@ -75,3 +113,4 @@ jobs:
           gh release upload ${{ needs.ready.outputs.version }} $BIN
         shell: bash
         name: Upload
+
