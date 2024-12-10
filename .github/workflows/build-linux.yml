@@ -4,7 +4,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "linux"
-  RELEASE: "build/x64/release/bundle/atom"
+  RELEASE: "build/linux/x64/release/bundle/atom"
 
 permissions:
   contents: write
@@ -67,7 +67,7 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ needs.pre.outputs.release }}"
           BIN="$REPO_NAME-${{ needs.pre.outputs.target }}"
-
+          cd build && tree
           mv $PREFIX $BIN
           gh release upload ${{ needs.ready.outputs.version }} $BIN
         shell: bash

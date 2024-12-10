@@ -39,11 +39,11 @@ jobs:
       - ready
     strategy:
       matrix:
-        target: [macos, app, ios]
+        target: [macos, android, ios]
         include:
           - target: macos
             build: "build macos --release"
-          - target: app
+          - target: android
             build: "build apk --release"
           - target: ios
             build: "build ipa --release --no-codesign"

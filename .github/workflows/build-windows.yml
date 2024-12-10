@@ -4,7 +4,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "windows"
-  RELEASE: "build/windows/x64/runner/Release/atom.exe"
+  RELEASE: "build/windows/x64/runner/Release"
 
 permissions:
   contents: write
@@ -63,10 +63,10 @@ jobs:
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $extension = $prefix -replace '^.*\.', ''
-          $bin= "$repoName-${{ needs.pre.outputs.target }}.$extension"
-          
-          Move-Item -Path "build/windows/x64/runner/Release/atom.exe" -Destination $bin
+          $bin= "$repoName-${{ needs.pre.outputs.target }}.zip"
+
+          cd $prefix
+          Compress-Archive -Path .\* -DestinationPath $bin
           gh release upload ${{ needs.ready.outputs.version }} $bin
         shell: pwsh
         name: Upload(windows)

@@ -61,8 +61,7 @@ jobs:
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ needs.pre.outputs.target }}"
-          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}.tar.gz"
-          ls -al build
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}.zip"
           cd build && zip -r $BIN $PREFIX
           gh release upload ${{ needs.ready.outputs.version }} $BIN
         shell: bash

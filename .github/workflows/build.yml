@@ -39,8 +39,14 @@ jobs:
       - ready
     strategy:
       matrix:
-        target: [android]
+        target: [macos, ios, android]
         include:
+          - target: macos
+            build: "build macos --release"
+            release: "build/macos/Build/Products/Release/atom.app"
+          - target: ios
+            build: "build ios --release --no-codesign"
+            release: "build/ios/Release-iphoneos/Runner.app"
           - target: android
             build: "build apk --release"
             release: "build/app/outputs/apk/release/app-release.apk"
