@@ -37,7 +37,7 @@ jobs:
       pub_path: ${{ needs.pre.outputs.pubspec }}
 
   build-legacy:
-    runs-on: macos12
+    runs-on: macos-12
     needs:
       - pre
       - ready
