@@ -3,7 +3,7 @@ name: build-legacy
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PUBSPEC: "pubspec.yaml"
-  TARGET: "linux"
+  TARGET: "macos"
   RELEASE: "build/macos/Build/Products/Release/atom.app"
 
 permissions:
