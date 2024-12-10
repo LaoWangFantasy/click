@@ -4,7 +4,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "linux"
-  RELEASE: "build/windows/x64/release/bundle/atom"
+  RELEASE: "build/x64/release/bundle/atom"
 
 permissions:
   contents: write
