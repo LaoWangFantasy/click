@@ -1,7 +1,7 @@
-name: atom
+name: click
 description: "A new Flutter project."
 publish_to: 'none'
-version: 0.0.4
+version: 0.0.5
 environment:
   sdk: ">=3.5.4 <4.0.0"
   flutter: 3.24.5
@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  window_manager: ^0.4.2
 
 dev_dependencies:
   flutter_test:

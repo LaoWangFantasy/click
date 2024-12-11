@@ -1,4 +1,4 @@
-# atom
+# click
 
 A new Flutter project.
 

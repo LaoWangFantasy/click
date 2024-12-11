@@ -1,6 +1,6 @@
 {
-    "name": "atom",
-    "short_name": "atom",
+    "name": "click",
+    "short_name": "click",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

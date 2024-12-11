@@ -1,125 +1,415 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
+
+    WindowOptions w = WindowOptions(
+      size: Size(300, 550),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: true,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+    windowManager.waitUntilReadyToShow(w, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
+
+  runApp(const ClickApp(title: 'Click Demo'));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ClickApp extends StatelessWidget {
+  final String title;
+  const ClickApp({super.key, required this.title});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: title,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
         useMaterial3: true,
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: Colors.white),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const BottomNavigationBarPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class BottomNavigationBarPage extends StatefulWidget {
+  const BottomNavigationBarPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<BottomNavigationBarPage> createState() =>
+      _BottomNavigationBarPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _BottomNavigationBarPageState extends State<BottomNavigationBarPage> {
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
+  static final List<Widget> _pages = [
+    const HomePage(title: "Click or Not"),
+    const UserPage(title: "My Profile"),
+  ];
+
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      body: SafeArea(
+        child: _pages[_selectedIndex],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.toggle_off),
+            label: 'Toggle',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_rounded),
+            label: 'Profile',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+        backgroundColor: const Color(0xFF203A43),
+        elevation: 10,
+        type: BottomNavigationBarType.fixed,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  final String title;
+  const HomePage({super.key, required this.title});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  bool _isClicked = false;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+  }
+
+  void _toggleClick() {
+    setState(() {
+      _isClicked = !_isClicked;
+      _animationController.forward(from: 0.0);
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Container(
+              width: screenWidth,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: _isClicked
+                      ? [
+                          const Color(0xFF0F2027),
+                          const Color(0xFF203A43),
+                          const Color(0xFF2C5364),
+                        ]
+                      : [
+                          const Color(0xFF0F2027),
+                          const Color(0xFF203A43),
+                          const Color(0xFF2C5364),
+                        ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: !_isClicked
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.03,
+                      horizontal: screenWidth * 0.05,
+                    ),
+                    child: Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.07,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Animated shield with foreground color
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Background glow
+                            Container(
+                              width: screenWidth * 0.3,
+                              height: screenWidth * 0.3,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _isClicked 
+                                      ? Colors.blueAccent.withOpacity(0.5)
+                                      : Colors.redAccent.withOpacity(0.9),
+                                    spreadRadius: 10,
+                                    blurRadius: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Animated shield icon
+                            AnimatedBuilder(
+                              animation: _animation,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: _animation.value,
+                                  child: Icon(
+                                    Icons.shield_rounded,
+                                    size: screenWidth * 0.25,
+                                    color: _isClicked
+                                        ? Colors.blueAccent
+                                        : Colors.redAccent,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(
+                          _isClicked ? 'Clicked' : 'UnClicked',
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.06,
+                            color: _isClicked
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        Text(
+                          _isClicked
+                              ? 'The click status is true'
+                              : 'The click status is false',
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.04,
+                            color: Colors.grey[300],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.03,
+                      horizontal: screenWidth * 0.05,
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _toggleClick,
+                      style: ElevatedButton.styleFrom(
+                        minimumSize:
+                            Size(screenWidth * 0.7, screenHeight * 0.07),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                      child: Text(
+                        _isClicked ? 'UnClick' : 'Click',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class UserPage extends StatelessWidget {
+  final String title;
+  const UserPage({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Container(
+              width: screenWidth,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF0F2027),
+                    Color(0xFF203A43),
+                    Color(0xFF2C5364),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.03,
+                      horizontal: screenWidth * 0.05,
+                    ),
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.07,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: screenWidth * 0.2,
+                          backgroundColor: Colors.blueAccent,
+                          child: Icon(
+                            Icons.person,
+                            size: screenWidth * 0.25,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(
+                          'John Doe',
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.06,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        Text(
+                          'Premium User',
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.04,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.03),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Add edit profile functionality
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize:
+                                Size(screenWidth * 0.7, screenHeight * 0.07),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            backgroundColor: Colors.blueAccent,
+                          ),
+                          child: Text(
+                            'Edit Profile',
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.045,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.05),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

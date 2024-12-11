@@ -45,7 +45,7 @@ jobs:
         include:
           - target: macos
             build: "build macos --release"
-            release: "build/macos/Build/Products/Release/atom.app"
+            release: "build/macos/Build/Products/Release/click.app"
           - target: ios
             build: "build ios --release --no-codesign"
             release: "build/ios/Release-iphoneos/Runner.app"
