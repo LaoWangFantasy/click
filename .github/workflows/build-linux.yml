@@ -69,7 +69,7 @@ jobs:
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ needs.pre.outputs.release }}"
-          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy.zip"
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy-$VERSION.zip"
           
           cd $PREFIX && zip -r $BIN ./*
           gh release upload ${{ needs.ready.outputs.version }} $BIN
