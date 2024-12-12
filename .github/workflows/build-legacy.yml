@@ -69,8 +69,9 @@ jobs:
           BIN="$REPO_NAME-${{ needs.pre.outputs.target }}"
 
           mv "${{ needs.pre.outputs.release }}" $BIN.$EXTENSION
-          mkdir -p dist
-          hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "./dist/$BIN-legacy.dmg"
-          gh release upload ${{ needs.ready.outputs.version }} ./dist/$BIN-legacy.dmg
+          hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN-legacy.dmg"
+          gh release upload $VERSION $BIN-legacy.dmg
+        env:
+          VERSION: ${{ needs.ready.outputs.version }}
         shell: bash
         name: Upload

@@ -46,8 +46,34 @@ class ClickApp extends StatelessWidget {
           AppTheme(),
         ],
       ),
-      home: const MainApp(),
+      initialRoute: RouteManager.initialRoute,
+      onGenerateRoute: RouteManager.onGenerateRoute,
     );
+  }
+}
+
+class RouteManager {
+  static const String initialRoute = '/';
+  static const String profilePage = '/profile';
+
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(
+          builder: (context) => const MainApp(),
+        );
+      case profilePage:
+        return MaterialPageRoute(
+          builder: (context) => const ProfilePage(
+            title: "My Profile",
+            appTheme: AppTheme(),
+          ),
+        );
+      default:
+        return MaterialPageRoute(
+          builder: (context) => const MainApp(),
+        );
+    }
   }
 }
 
@@ -192,7 +218,9 @@ class _DashboardPageState extends State<DashboardPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
-  bool _shouldAnimate = false;
+
+  // Replacing _shouldAnimate with shouldAnimate
+  bool shouldAnimate = false;
 
   @override
   void initState() {
@@ -212,13 +240,13 @@ class _DashboardPageState extends State<DashboardPage>
   void _triggerAnimation() {
     if (mounted) {
       setState(() {
-        _shouldAnimate = true;
+        shouldAnimate = true;
       });
       _animationController.forward(from: 0.0);
       Future.delayed(const Duration(milliseconds: 400), () {
         if (mounted) {
           setState(() {
-            _shouldAnimate = false;
+            shouldAnimate = false;
           });
         }
       });
@@ -290,16 +318,13 @@ class _DashboardPageState extends State<DashboardPage>
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.05),
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Animated shield with foreground color
                             Stack(
                               alignment: Alignment.center,
                               children: [
-                                // Background glow
                                 Container(
                                   width: screenWidth * 0.3,
                                   height: screenWidth * 0.3,
@@ -317,7 +342,6 @@ class _DashboardPageState extends State<DashboardPage>
                                     ],
                                   ),
                                 ),
-                                // Animated shield icon
                                 AnimatedBuilder(
                                   animation: _animation,
                                   builder: (context, child) {
@@ -381,109 +405,22 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Container(
-              width: screenWidth,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    appTheme.gradientStartColor,
-                    appTheme.gradientMiddleColor,
-                    appTheme.gradientEndColor,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.03,
-                      horizontal: screenWidth * 0.05,
-                    ),
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.07,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: screenWidth * 0.2,
-                          backgroundColor: appTheme.selectedItemColor,
-                          child: Icon(
-                            Icons.person,
-                            size: screenWidth * 0.25,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        Text(
-                          'John Doe',
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.06,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.01),
-                        Text(
-                          'Premium User',
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.04,
-                            color: Colors.grey[300],
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.03),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Add edit profile functionality
-                          },
-                          style: ElevatedButton.styleFrom(
-                            minimumSize:
-                                Size(screenWidth * 0.7, screenHeight * 0.07),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            backgroundColor: appTheme.selectedItemColor,
-                          ),
-                          child: Text(
-                            'Edit Profile',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.045,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.05),
-                ],
-              ),
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: appTheme.gradientMiddleColor,
+        title: Text(
+          title,
+          style: TextStyle(
+            color: appTheme.selectedItemColor,
           ),
-        );
-      },
+        ),
+      ),
+      body: Center(
+        child: Text(
+          'Profile Page',
+          style: TextStyle(color: appTheme.selectedItemColor, fontSize: 24),
+        ),
+      ),
     );
   }
 }
