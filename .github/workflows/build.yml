@@ -72,7 +72,8 @@ jobs:
       - 
         name: Build for ${{ matrix.target }}
         run:
-          flutter ${{ matrix.build }}        shell: bash
+          flutter ${{ matrix.build }}
+        shell: bash
       - 
         if: matrix.target == 'android'
         run: |
@@ -83,6 +84,7 @@ jobs:
 
           mv "${{ matrix.release }}" $BIN
           gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
+
         shell: bash
         name: Upload
       - 
