@@ -67,7 +67,7 @@ jobs:
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $bin= "$repoName-${{ needs.pre.outputs.target }}-legacy-${{ needs.ready.outputs.version }}.zip"
+          $bin= "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
 
           cd $prefix
           Compress-Archive -Path .\* -DestinationPath $bin
@@ -102,7 +102,7 @@ jobs:
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $bin= "$repoName-${{ needs.pre.outputs.target }}-${{ needs.ready.outputs.version }}.zip"
+          $bin= "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.zip"
 
           cd $prefix
           Compress-Archive -Path .\* -DestinationPath $bin

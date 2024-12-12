@@ -75,7 +75,7 @@ jobs:
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.target }}"
-          BIN="$REPO_NAME-${{ matrix.target }}-${{ needs.ready.outputs.version }}.zip"
+          BIN="$REPO_NAME-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.zip"
           ls -al build
           cd build && zip -r $BIN $PREFIX
           gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber

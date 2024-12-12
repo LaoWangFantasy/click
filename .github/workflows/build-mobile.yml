@@ -34,18 +34,15 @@ jobs:
     with:
       pub_path: ${{ needs.pre.outputs.pubspec }}
 
-  build:
+  build-mobile:
     runs-on: macos-latest
     needs:
       - pre
       - ready
     strategy:
       matrix:
-        target: [macos, ios, android]
+        target: [ios, android]
         include:
-          - target: macos
-            build: "build macos --release"
-            release: "build/macos/Build/Products/Release/click.app"
           - target: ios
             build: "build ios --release --no-codesign"
             release: "build/ios/Release-iphoneos/Runner.app"
@@ -80,7 +77,7 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ matrix.target }}-${{ needs.ready.outputs.version }}.$EXTENSION"
+          BIN="$REPO_NAME-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.$EXTENSION"
 
           mv "${{ matrix.release }}" $BIN
           gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
@@ -88,12 +85,12 @@ jobs:
         shell: bash
         name: Upload
       - 
-        if: matrix.target != 'android'
+        if: matrix.target == 'ios'
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ matrix.target }}-${{ needs.ready.outputs.version }}"
+          BIN="$REPO_NAME-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}"
 
           mv "${{ matrix.release }}" $BIN.$EXTENSION
           mkdir -p dist
