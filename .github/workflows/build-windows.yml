@@ -38,42 +38,6 @@ jobs:
     with:
       pub_path: ${{ needs.pre.outputs.pubspec }}
 
-  build-windows-legacy:
-    runs-on: windows-2019
-    needs:
-      - pre
-      - ready
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Set up Flutter
-        uses: subosito/flutter-action@v2.18.0
-        with:
-          channel: stable
-          flutter-version-file: pubspec.yaml
-      -
-        run: flutter --version
-      -
-        run: flutter pub get
-      -
-        run: flutter test
-      -
-        run: flutter build windows
-      -
-        run: |
-          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
-          $prefix = "${{ needs.pre.outputs.release }}"
-          $bin= "$repoName-${{ needs.pre.outputs.target }}-legacy-$VERSION.zip"
-
-          cd $prefix
-          Compress-Archive -Path .\* -DestinationPath "$bin"
-          gh release upload "$VERSION" "$bin" --clobber
-        env:
-          VERSION: ${{ needs.ready.outputs.version }}
-        shell: pwsh
-        name: Upload(windows)
   build-windows:
     runs-on: windows-latest
     needs:
@@ -101,11 +65,11 @@ jobs:
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $bin= "$repoName-${{ needs.pre.outputs.target }}-$VERSION.zip"
+          $bin= "$repoName-${{ needs.pre.outputs.target }}.zip"
 
           cd $prefix
-          Compress-Archive -Path .\* -DestinationPath "$bin"
-          gh release upload "$VERSION" "$bin" --clobber
+          Compress-Archive -Path .\* -DestinationPath $bin
+          gh release upload $VERSION $bin
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: pwsh
