@@ -8,7 +8,7 @@ void main() async {
     await windowManager.ensureInitialized();
 
     WindowOptions w = WindowOptions(
-      size: Size(300, 550),
+      size: const Size(300, 550),
       center: true,
       backgroundColor: Colors.transparent,
       skipTaskbar: true,
@@ -25,6 +25,7 @@ void main() async {
 
 class ClickApp extends StatelessWidget {
   final String title;
+
   const ClickApp({super.key, required this.title});
 
   @override
@@ -34,47 +35,122 @@ class ClickApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+          seedColor: const Color(0xFF2C5364),
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
         textTheme: const TextTheme(
           bodyMedium: TextStyle(color: Colors.white),
         ),
+        extensions: const <ThemeExtension<dynamic>>[
+          AppTheme(),
+        ],
       ),
-      home: const BottomNavigationBarPage(),
+      home: const MainApp(),
     );
   }
 }
 
-class BottomNavigationBarPage extends StatefulWidget {
-  const BottomNavigationBarPage({super.key});
+class AppTheme extends ThemeExtension<AppTheme> {
+  const AppTheme({
+    this.gradientStartColor = const Color(0xFF0F2027),
+    this.gradientMiddleColor = const Color(0xFF203A43),
+    this.gradientEndColor = const Color(0xFF2C5364),
+    this.selectedItemColor = Colors.blueAccent,
+    this.unselectedItemColor = Colors.grey,
+    this.disabledColor = const Color(0xFF787878),
+    this.shadowColor = Colors.black,
+  });
+
+  final Color gradientStartColor;
+  final Color gradientMiddleColor;
+  final Color gradientEndColor;
+  final Color selectedItemColor;
+  final Color unselectedItemColor;
+  final Color disabledColor;
+  final Color shadowColor;
 
   @override
-  State<BottomNavigationBarPage> createState() =>
-      _BottomNavigationBarPageState();
+  AppTheme copyWith({
+    Color? gradientStartColor,
+    Color? gradientMiddleColor,
+    Color? gradientEndColor,
+    Color? selectedItemColor,
+    Color? unselectedItemColor,
+    Color? disabledColor,
+    Color? shadowColor,
+  }) {
+    return AppTheme(
+      gradientStartColor: gradientStartColor ?? this.gradientStartColor,
+      gradientMiddleColor: gradientMiddleColor ?? this.gradientMiddleColor,
+      gradientEndColor: gradientEndColor ?? this.gradientEndColor,
+      selectedItemColor: selectedItemColor ?? this.selectedItemColor,
+      unselectedItemColor: unselectedItemColor ?? this.unselectedItemColor,
+      disabledColor: disabledColor ?? this.disabledColor,
+      shadowColor: shadowColor ?? this.shadowColor,
+    );
+  }
+
+  @override
+  AppTheme lerp(ThemeExtension<AppTheme>? other, double t) {
+    if (other is! AppTheme) {
+      return this;
+    }
+    return AppTheme(
+      gradientStartColor:
+          Color.lerp(gradientStartColor, other.gradientStartColor, t)!,
+      gradientMiddleColor:
+          Color.lerp(gradientMiddleColor, other.gradientMiddleColor, t)!,
+      gradientEndColor:
+          Color.lerp(gradientEndColor, other.gradientEndColor, t)!,
+      selectedItemColor:
+          Color.lerp(selectedItemColor, other.selectedItemColor, t)!,
+      unselectedItemColor:
+          Color.lerp(unselectedItemColor, other.unselectedItemColor, t)!,
+      disabledColor: Color.lerp(disabledColor, other.disabledColor, t)!,
+      shadowColor: Color.lerp(shadowColor, other.shadowColor, t)!,
+    );
+  }
 }
 
-class _BottomNavigationBarPageState extends State<BottomNavigationBarPage> {
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
   int _selectedIndex = 0;
+  final ValueNotifier<bool> _isClickedNotifier = ValueNotifier<bool>(true);
 
-  static final List<Widget> _pages = [
-    const HomePage(title: "Click or Not"),
-    const UserPage(title: "My Profile"),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _toggleClick() {
+    _isClickedNotifier.value = !_isClickedNotifier.value;
+    final dashboardPageState =
+        context.findAncestorStateOfType<_DashboardPageState>();
+    dashboardPageState?._triggerAnimation();
   }
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = Theme.of(context).extension<AppTheme>()!;
     return Scaffold(
       body: SafeArea(
-        child: _pages[_selectedIndex],
+          child: _selectedIndex == 0
+              ? DashboardPage(title: "Click or Not", appTheme: appTheme)
+              : ProfilePage(title: "My Profile", appTheme: appTheme)),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _toggleClick,
+        backgroundColor: appTheme.selectedItemColor,
+        shape: const CircleBorder(),
+        elevation: 5.0,
+        child: const Icon(
+          Icons.touch_app_rounded,
+          size: 30,
+          color: Colors.white,
+        ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -87,10 +163,14 @@ class _BottomNavigationBarPageState extends State<BottomNavigationBarPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-        backgroundColor: const Color(0xFF203A43),
+        selectedItemColor: appTheme.selectedItemColor,
+        unselectedItemColor: appTheme.unselectedItemColor,
+        onTap: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        backgroundColor: appTheme.gradientMiddleColor,
         elevation: 10,
         type: BottomNavigationBarType.fixed,
       ),
@@ -98,39 +178,51 @@ class _BottomNavigationBarPageState extends State<BottomNavigationBarPage> {
   }
 }
 
-class HomePage extends StatefulWidget {
+class DashboardPage extends StatefulWidget {
   final String title;
-  const HomePage({super.key, required this.title});
+  final AppTheme appTheme;
+
+  const DashboardPage({super.key, required this.title, required this.appTheme});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  bool _isClicked = false;
+class _DashboardPageState extends State<DashboardPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
+  bool _shouldAnimate = false;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
     _animation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Curves.elasticOut,
+        curve: Curves.fastOutSlowIn,
       ),
     );
   }
 
-  void _toggleClick() {
-    setState(() {
-      _isClicked = !_isClicked;
+  void _triggerAnimation() {
+    if (mounted) {
+      setState(() {
+        _shouldAnimate = true;
+      });
       _animationController.forward(from: 0.0);
-    });
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (mounted) {
+          setState(() {
+            _shouldAnimate = false;
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -138,6 +230,154 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _animationController.dispose();
     super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final isClickedNotifier =
+        context.findAncestorStateOfType<_MainAppState>()?._isClickedNotifier;
+
+    return ValueListenableBuilder<bool>(
+      valueListenable: isClickedNotifier!,
+      builder: (context, isClicked, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Container(
+                  width: screenWidth,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        widget.appTheme.gradientStartColor,
+                        widget.appTheme.gradientMiddleColor,
+                        widget.appTheme.gradientEndColor,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: !isClicked
+                        ? [
+                            BoxShadow(
+                              color:
+                                  widget.appTheme.shadowColor.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.03,
+                          horizontal: screenWidth * 0.05,
+                        ),
+                        child: Text(
+                          widget.title,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.07,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.05),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Animated shield with foreground color
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Background glow
+                                Container(
+                                  width: screenWidth * 0.3,
+                                  height: screenWidth * 0.3,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: isClicked
+                                            ? widget.appTheme.selectedItemColor
+                                                .withOpacity(0.5)
+                                            : Colors.redAccent.withOpacity(0.9),
+                                        spreadRadius: 10,
+                                        blurRadius: 20,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Animated shield icon
+                                AnimatedBuilder(
+                                  animation: _animation,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: _animation.value,
+                                      child: Icon(
+                                        Icons.shield_rounded,
+                                        size: screenWidth * 0.25,
+                                        color: isClicked
+                                            ? widget.appTheme.selectedItemColor
+                                            : Colors.redAccent,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            Text(
+                              isClicked ? 'Clicked' : 'UnClicked',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.06,
+                                color: isClicked
+                                    ? Colors.greenAccent
+                                    : Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: screenHeight * 0.01),
+                            Text(
+                              isClicked
+                                  ? 'The click status is true'
+                                  : 'The click status is false',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                                color: Colors.grey[300],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.15),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  final String title;
+  final AppTheme appTheme;
+
+  const ProfilePage({super.key, required this.title, required this.appTheme});
 
   @override
   Widget build(BuildContext context) {
@@ -154,176 +394,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               width: screenWidth,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: _isClicked
-                      ? [
-                          const Color(0xFF0F2027),
-                          const Color(0xFF203A43),
-                          const Color(0xFF2C5364),
-                        ]
-                      : [
-                          const Color(0xFF0F2027),
-                          const Color(0xFF203A43),
-                          const Color(0xFF2C5364),
-                        ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: !_isClicked
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.03,
-                      horizontal: screenWidth * 0.05,
-                    ),
-                    child: Text(
-                      widget.title,
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.07,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Animated shield with foreground color
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Background glow
-                            Container(
-                              width: screenWidth * 0.3,
-                              height: screenWidth * 0.3,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _isClicked 
-                                      ? Colors.blueAccent.withOpacity(0.5)
-                                      : Colors.redAccent.withOpacity(0.9),
-                                    spreadRadius: 10,
-                                    blurRadius: 20,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Animated shield icon
-                            AnimatedBuilder(
-                              animation: _animation,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  scale: _animation.value,
-                                  child: Icon(
-                                    Icons.shield_rounded,
-                                    size: screenWidth * 0.25,
-                                    color: _isClicked
-                                        ? Colors.blueAccent
-                                        : Colors.redAccent,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        Text(
-                          _isClicked ? 'Clicked' : 'UnClicked',
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.06,
-                            color: _isClicked
-                                ? Colors.greenAccent
-                                : Colors.redAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.01),
-                        Text(
-                          _isClicked
-                              ? 'The click status is true'
-                              : 'The click status is false',
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.04,
-                            color: Colors.grey[300],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.03,
-                      horizontal: screenWidth * 0.05,
-                    ),
-                    child: ElevatedButton(
-                      onPressed: _toggleClick,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize:
-                            Size(screenWidth * 0.7, screenHeight * 0.07),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        backgroundColor: Colors.blueAccent,
-                      ),
-                      child: Text(
-                        _isClicked ? 'UnClick' : 'Click',
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.045,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class UserPage extends StatelessWidget {
-  final String title;
-  const UserPage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Container(
-              width: screenWidth,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
                   colors: [
-                    Color(0xFF0F2027),
-                    Color(0xFF203A43),
-                    Color(0xFF2C5364),
+                    appTheme.gradientStartColor,
+                    appTheme.gradientMiddleColor,
+                    appTheme.gradientEndColor,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -355,7 +429,7 @@ class UserPage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: screenWidth * 0.2,
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: appTheme.selectedItemColor,
                           child: Icon(
                             Icons.person,
                             size: screenWidth * 0.25,
@@ -390,7 +464,7 @@ class UserPage extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
-                            backgroundColor: Colors.blueAccent,
+                            backgroundColor: appTheme.selectedItemColor,
                           ),
                           child: Text(
                             'Edit Profile',
