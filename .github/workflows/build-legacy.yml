@@ -66,12 +66,10 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ needs.pre.outputs.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy-$VERSION"
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy-${{ needs.ready.outputs.version }}"
 
           mv "${{ needs.pre.outputs.release }}" $BIN.$EXTENSION
           hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN.dmg"
-          gh release upload $VERSION $BIN.dmg --clobber
-        env:
-          VERSION: ${{ needs.ready.outputs.version }}
+          gh release upload ${{ needs.ready.outputs.version }} $BIN.dmg --clobber
         shell: bash
         name: Upload

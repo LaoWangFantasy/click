@@ -72,20 +72,17 @@ jobs:
       - 
         name: Build for ${{ matrix.target }}
         run:
-          flutter ${{ matrix.build }}
-        shell: bash
+          flutter ${{ matrix.build }}        shell: bash
       - 
         if: matrix.target == 'android'
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ matrix.target }}-$VERSION.$EXTENSION"
+          BIN="$REPO_NAME-${{ matrix.target }}-${{ needs.ready.outputs.version }}.$EXTENSION"
 
           mv "${{ matrix.release }}" $BIN
-          gh release upload $VERSION $BIN --clobber
-        env:
-          VERSION: ${{ needs.ready.outputs.version }}
+          gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
         shell: bash
         name: Upload
       - 
@@ -94,13 +91,11 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ matrix.target }}-$VERSION"
+          BIN="$REPO_NAME-${{ matrix.target }}-${{ needs.ready.outputs.version }}"
 
           mv "${{ matrix.release }}" $BIN.$EXTENSION
           mkdir -p dist
           hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN.dmg"
-          gh release upload $VERSION $BIN.dmg --clobber
-        env:
-          VERSION: ${{ needs.ready.outputs.version }}
+          gh release upload ${{ needs.ready.outputs.version }} $BIN.dmg --clobber
         shell: bash
         name: Upload

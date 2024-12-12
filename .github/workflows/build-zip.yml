@@ -69,17 +69,14 @@ jobs:
       - 
         name: Build for ${{ matrix.target }}
         run:
-          flutter ${{ matrix.build }}
-        shell: bash
+          flutter ${{ matrix.build }}        shell: bash
       - 
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.target }}"
-          BIN="$REPO_NAME-${{ matrix.target }}.zip-$VERSION"
+          BIN="$REPO_NAME-${{ matrix.target }}-${{ needs.ready.outputs.version }}.zip"
           ls -al build
           cd build && zip -r $BIN $PREFIX
-          gh release upload $VERSION $BIN --clobber
-        env:
-          VERSION: ${{ needs.ready.outputs.version }}
+          gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
         shell: bash
         name: Upload

@@ -69,7 +69,7 @@ jobs:
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ needs.pre.outputs.release }}"
-          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy-$VERSION.zip"
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy-${{ needs.ready.outputs.version }}.zip"
           
           cd $PREFIX && zip -r $BIN ./*
           gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
@@ -107,12 +107,10 @@ jobs:
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ needs.pre.outputs.release }}"
-          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-$VERSION.zip"
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-${{ needs.ready.outputs.version }}.zip"
           
           cd $PREFIX && zip -r $BIN ./*
-          gh release upload $VERSION $BIN --clobber
-        env:
-          VERSION: ${{ needs.ready.outputs.version }}
+          gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
         shell: bash
         name: Upload
 

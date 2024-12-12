@@ -7,14 +7,14 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await windowManager.ensureInitialized();
 
-    WindowOptions w = WindowOptions(
-      size: const Size(300, 550),
+    const windowOptions = WindowOptions(
+      size: Size(300, 550),
       center: true,
       backgroundColor: Colors.transparent,
       skipTaskbar: true,
       titleBarStyle: TitleBarStyle.hidden,
     );
-    windowManager.waitUntilReadyToShow(w, () async {
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
     });
@@ -57,21 +57,22 @@ class RouteManager {
   static const String profilePage = '/profile';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    final appTheme = const AppTheme(); // Create AppTheme here for use in pages
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-          builder: (context) => const MainApp(),
+          builder: (context) => MainApp(appTheme: appTheme),
         );
       case profilePage:
         return MaterialPageRoute(
-          builder: (context) => const ProfilePage(
+          builder: (context) => ProfilePage(
             title: "My Profile",
-            appTheme: AppTheme(),
+            appTheme: appTheme,
           ),
         );
       default:
         return MaterialPageRoute(
-          builder: (context) => const MainApp(),
+          builder: (context) => MainApp(appTheme: appTheme),
         );
     }
   }
@@ -140,7 +141,9 @@ class AppTheme extends ThemeExtension<AppTheme> {
 }
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+  final AppTheme appTheme;
+
+  const MainApp({super.key, required this.appTheme});
 
   @override
   State<MainApp> createState() => _MainAppState();
@@ -152,22 +155,23 @@ class _MainAppState extends State<MainApp> {
 
   void _toggleClick() {
     _isClickedNotifier.value = !_isClickedNotifier.value;
-    final dashboardPageState =
-        context.findAncestorStateOfType<_DashboardPageState>();
-    dashboardPageState?._triggerAnimation();
   }
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Theme.of(context).extension<AppTheme>()!;
     return Scaffold(
       body: SafeArea(
           child: _selectedIndex == 0
-              ? DashboardPage(title: "Click or Not", appTheme: appTheme)
-              : ProfilePage(title: "My Profile", appTheme: appTheme)),
+              ? DashboardPage(
+                  title: "Click or Not",
+                  appTheme: widget.appTheme,
+                  isClickedNotifier: _isClickedNotifier,
+                  onAnimationTriggered: _toggleClick,
+                )
+              : ProfilePage(title: "My Profile", appTheme: widget.appTheme)),
       floatingActionButton: FloatingActionButton(
         onPressed: _toggleClick,
-        backgroundColor: appTheme.selectedItemColor,
+        backgroundColor: widget.appTheme.selectedItemColor,
         shape: const CircleBorder(),
         elevation: 5.0,
         child: const Icon(
@@ -189,14 +193,14 @@ class _MainAppState extends State<MainApp> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: appTheme.selectedItemColor,
-        unselectedItemColor: appTheme.unselectedItemColor,
+        selectedItemColor: widget.appTheme.selectedItemColor,
+        unselectedItemColor: widget.appTheme.unselectedItemColor,
         onTap: (int index) {
           setState(() {
             _selectedIndex = index;
           });
         },
-        backgroundColor: appTheme.gradientMiddleColor,
+        backgroundColor: widget.appTheme.gradientMiddleColor,
         elevation: 10,
         type: BottomNavigationBarType.fixed,
       ),
@@ -207,8 +211,16 @@ class _MainAppState extends State<MainApp> {
 class DashboardPage extends StatefulWidget {
   final String title;
   final AppTheme appTheme;
+  final ValueNotifier<bool> isClickedNotifier;
+  final VoidCallback onAnimationTriggered;
 
-  const DashboardPage({super.key, required this.title, required this.appTheme});
+  const DashboardPage({
+    super.key,
+    required this.title,
+    required this.appTheme,
+    required this.isClickedNotifier,
+    required this.onAnimationTriggered,
+  });
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -218,8 +230,6 @@ class _DashboardPageState extends State<DashboardPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
-
-  // Replacing _shouldAnimate with shouldAnimate
   bool shouldAnimate = false;
 
   @override
@@ -237,22 +247,6 @@ class _DashboardPageState extends State<DashboardPage>
     );
   }
 
-  void _triggerAnimation() {
-    if (mounted) {
-      setState(() {
-        shouldAnimate = true;
-      });
-      _animationController.forward(from: 0.0);
-      Future.delayed(const Duration(milliseconds: 400), () {
-        if (mounted) {
-          setState(() {
-            shouldAnimate = false;
-          });
-        }
-      });
-    }
-  }
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -264,11 +258,9 @@ class _DashboardPageState extends State<DashboardPage>
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    final isClickedNotifier =
-        context.findAncestorStateOfType<_MainAppState>()?._isClickedNotifier;
 
     return ValueListenableBuilder<bool>(
-      valueListenable: isClickedNotifier!,
+      valueListenable: widget.isClickedNotifier,
       builder: (context, isClicked, child) {
         return LayoutBuilder(
           builder: (context, constraints) {
