@@ -70,7 +70,7 @@ jobs:
 
           mv "${{ needs.pre.outputs.release }}" $BIN.$EXTENSION
           hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN.dmg"
-          gh release upload $VERSION $BIN.dmg
+          gh release upload $VERSION $BIN.dmg --clobber
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: bash

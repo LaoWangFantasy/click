@@ -83,7 +83,7 @@ jobs:
           BIN="$REPO_NAME-${{ matrix.target }}-$VERSION.$EXTENSION"
 
           mv "${{ matrix.release }}" $BIN
-          gh release upload $VERSION $BIN
+          gh release upload $VERSION $BIN --clobber
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: bash
@@ -99,7 +99,7 @@ jobs:
           mv "${{ matrix.release }}" $BIN.$EXTENSION
           mkdir -p dist
           hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN.dmg"
-          gh release upload $VERSION $BIN.dmg
+          gh release upload $VERSION $BIN.dmg --clobber
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: bash

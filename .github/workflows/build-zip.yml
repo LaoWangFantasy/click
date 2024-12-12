@@ -78,7 +78,7 @@ jobs:
           BIN="$REPO_NAME-${{ matrix.target }}.zip-$VERSION"
           ls -al build
           cd build && zip -r $BIN $PREFIX
-          gh release upload $VERSION $BIN
+          gh release upload $VERSION $BIN --clobber
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: bash

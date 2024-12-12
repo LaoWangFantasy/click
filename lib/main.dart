@@ -291,7 +291,7 @@ class _DashboardPageState extends State<DashboardPage>
                         ? [
                             BoxShadow(
                               color:
-                                  widget.appTheme.shadowColor.withOpacity(0.5),
+                                  widget.appTheme.shadowColor.withValues(alpha: 0.5),
                               spreadRadius: 5,
                               blurRadius: 10,
                               offset: const Offset(0, 3),
@@ -334,8 +334,8 @@ class _DashboardPageState extends State<DashboardPage>
                                       BoxShadow(
                                         color: isClicked
                                             ? widget.appTheme.selectedItemColor
-                                                .withOpacity(0.5)
-                                            : Colors.redAccent.withOpacity(0.9),
+                                                .withValues(alpha: 0.5)
+                                            : Colors.redAccent.withValues(alpha: 0.5),
                                         spreadRadius: 10,
                                         blurRadius: 20,
                                       ),

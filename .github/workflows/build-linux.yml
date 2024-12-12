@@ -72,7 +72,7 @@ jobs:
           BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy-$VERSION.zip"
           
           cd $PREFIX && zip -r $BIN ./*
-          gh release upload ${{ needs.ready.outputs.version }} $BIN
+          gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
         shell: bash
         name: Upload
 
@@ -110,7 +110,7 @@ jobs:
           BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-$VERSION.zip"
           
           cd $PREFIX && zip -r $BIN ./*
-          gh release upload $VERSION $BIN
+          gh release upload $VERSION $BIN --clobber
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: bash

@@ -68,8 +68,8 @@ jobs:
           $bin= "$repoName-${{ needs.pre.outputs.target }}-legacy-$VERSION.zip"
 
           cd $prefix
-          Compress-Archive -Path .\* -DestinationPath $bin
-          gh release upload $VERSION $bin
+          Compress-Archive -Path .\* -DestinationPath "$bin"
+          gh release upload "$VERSION" "$bin" --clobber
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: pwsh
@@ -104,8 +104,8 @@ jobs:
           $bin= "$repoName-${{ needs.pre.outputs.target }}-$VERSION.zip"
 
           cd $prefix
-          Compress-Archive -Path .\* -DestinationPath $bin
-          gh release upload $VERSION $bin
+          Compress-Archive -Path .\* -DestinationPath "$bin"
+          gh release upload "$VERSION" "$bin" --clobber
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: pwsh
