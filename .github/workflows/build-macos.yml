@@ -1,4 +1,4 @@
-name: build-legacy
+name: build-macos
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

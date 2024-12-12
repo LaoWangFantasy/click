@@ -32,7 +32,8 @@ class _ClickAppState extends State<ClickApp> {
                   isClickedNotifier: _isClickedNotifier,
                   onAnimationTriggered: _toggleClick,
                 )
-              : ProfilePage(title: "My Profile", appTheme: widget.appTheme)),
+              : ProfilePage(title: "My Profile", appTheme: widget.appTheme)
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _toggleClick,
         backgroundColor: widget.appTheme.selectedItemColor,
