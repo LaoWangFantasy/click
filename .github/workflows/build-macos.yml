@@ -74,42 +74,6 @@ jobs:
         shell: bash
         name: Upload
 
-  build-macos-legacy:
-    runs-on: macos-13
-    needs:
-      - pre
-      - ready
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version-file: pubspec.yaml
-      -
-        run: flutter --version
-      -
-        run: flutter pub get
-      -
-        run: flutter test
-      -
-        run: flutter build ${{ needs.pre.outputs.target }}
-      - 
-        run: |
-          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
-          PREFIX="${{ needs.pre.outputs.release }}"
-          EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy"
-
-          mv "${{ needs.pre.outputs.release }}" $BIN.$EXTENSION
-          hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN.dmg"
-          gh release upload ${{ needs.ready.outputs.version }} $BIN.dmg --clobber
-        shell: bash
-        name: Upload
-
   build-macos:
     runs-on: macos-latest
     needs:
