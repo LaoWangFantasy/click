@@ -80,7 +80,7 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ matrix.target }}.$EXTENSION"
+          BIN="$REPO_NAME-${{ matrix.target }}-$VERSION.$EXTENSION"
 
           mv "${{ matrix.release }}" $BIN
           gh release upload $VERSION $BIN
@@ -94,7 +94,7 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ matrix.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ matrix.target }}"
+          BIN="$REPO_NAME-${{ matrix.target }}-$VERSION"
 
           mv "${{ matrix.release }}" $BIN.$EXTENSION
           mkdir -p dist

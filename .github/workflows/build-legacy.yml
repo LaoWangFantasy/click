@@ -38,7 +38,7 @@ jobs:
     with:
       pub_path: ${{ needs.pre.outputs.pubspec }}
 
-  build-legacy:
+  build-macos-legacy:
     runs-on: macos-13
     needs:
       - pre
@@ -66,11 +66,11 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           PREFIX="${{ needs.pre.outputs.release }}"
           EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}"
+          BIN="$REPO_NAME-${{ needs.pre.outputs.target }}-legacy-$VERSION"
 
           mv "${{ needs.pre.outputs.release }}" $BIN.$EXTENSION
-          hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN-legacy.dmg"
-          gh release upload $VERSION $BIN-legacy.dmg
+          hdiutil create -volname "$BIN" -srcfolder "$BIN.$EXTENSION" -ov -format UDZO "$BIN.dmg"
+          gh release upload $VERSION $BIN.dmg
         env:
           VERSION: ${{ needs.ready.outputs.version }}
         shell: bash
