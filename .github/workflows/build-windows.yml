@@ -69,8 +69,6 @@ jobs:
 
           cd $prefix
           Compress-Archive -Path .\* -DestinationPath $bin
-          gh release upload $VERSION $bin
-        env:
-          VERSION: ${{ needs.ready.outputs.version }}
+          gh release upload ${{ needs.ready.outputs.version }} $bin
         shell: pwsh
         name: Upload(windows)
