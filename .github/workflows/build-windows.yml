@@ -63,6 +63,7 @@ jobs:
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
+      - uses: KamaranL/add-signtool-action@v1
       -
         run: choco install yq
       -
