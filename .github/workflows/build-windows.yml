@@ -74,13 +74,13 @@ jobs:
       -
         uses: GabrielAcostaEngler/signtool-code-sign@main
         with:
-          certificate: '${{ needs.pkcs12.outputs.pfx-base64 }}'
-          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
-          cert-sha1: '${{ needs.pkcs12.outputs.pfx-sha1 }}'
-          cert-description: 'foo'
-          folder: '${{ needs.pre.outputs.release }}'
           recursive: true
+          cert-description: 'foo'
           timestamp-server: 'http://timestamp.digicert.com'
+          certificate: '${{ needs.pkcs12.outputs.pfx-base64 }}'
+          cert-sha1: '${{ needs.pkcs12.outputs.pfx-sha1 }}'
+          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
+          folder: '${{ needs.pre.outputs.release }}'
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
@@ -121,13 +121,13 @@ jobs:
       -
         uses: GabrielAcostaEngler/signtool-code-sign@main
         with:
-          certificate: '${{ needs.pkcs12.outputs.pfx-base64 }}'
-          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
-          cert-sha1: '${{ needs.pkcs12.outputs.pfx-sha1 }}'
-          cert-description: 'foo'
-          folder: '${{ needs.pre.outputs.release }}'
           recursive: true
+          cert-description: 'foo'
           timestamp-server: 'http://timestamp.digicert.com'
+          certificate: '${{ needs.pkcs12.outputs.pfx-base64 }}'
+          cert-sha1: '${{ needs.pkcs12.outputs.pfx-sha1 }}'
+          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
+          folder: '${{ needs.pre.outputs.release }}'
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
