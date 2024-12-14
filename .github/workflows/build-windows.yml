@@ -2,7 +2,6 @@ name: build-windows
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  WINDOWS_PFX_PASSWD: ${{ secrets.WINDOWS_PFX_PASSWD }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "windows"
   RELEASE: "build/windows/x64/runner/Release"
@@ -29,7 +28,6 @@ jobs:
       pubspec: ${{ env.PUBSPEC }}
       target: ${{ env.TARGET }}
       release: ${{ env.RELEASE }}
-      pfx: ${{ env.WINDOWS_PFX_PASSWD }}
     steps:
       - run: echo "Bypass GitHub Action Restriction"
 
@@ -38,7 +36,7 @@ jobs:
       - pre
     uses: LaoWangFantasy/Flutter-Actions/.github/workflows/create-pfx.yml@master
     with:
-      pkcs12-secret: ${{ needs.pre.outputs.pfx }}
+      pkcs12-secret: ${{ needs.pre.outputs.pfx-passwd }}
 
   ready:
     needs:
@@ -74,16 +72,15 @@ jobs:
       -
         run: flutter build windows
       -
-        run: |
-          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
-          $prefix = "${{ needs.pre.outputs.release }}"
-          $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
-          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool"
-
-          cd $signtool
-          [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
-          signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $pfxBase64/$repoName.exe
-        shell: pwsh
+        uses: GabrielAcostaEngler/signtool-code-sign@main
+        with:
+          certificate: '${{ needs.pkcs12.outputs.pfx-base64 }}'
+          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
+          cert-sha1: '${{ needs.pkcs12.outputs.pfx-sha1 }}'
+          cert-description: 'foo'
+          folder: '${{ needs.pre.outputs.release }}'
+          recursive: true
+          timestamp-server: 'http://timestamp.digicert.com'
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
@@ -122,16 +119,15 @@ jobs:
       -
         run: flutter build windows
       -
-        run: |
-          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
-          $prefix = "${{ needs.pre.outputs.release }}"
-          $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
-          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
-
-          cd $prefix
-          [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
-          $signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
-        shell: pwsh
+        uses: GabrielAcostaEngler/signtool-code-sign@main
+        with:
+          certificate: '${{ needs.pkcs12.outputs.pfx-base64 }}'
+          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
+          cert-sha1: '${{ needs.pkcs12.outputs.pfx-sha1 }}'
+          cert-description: 'foo'
+          folder: '${{ needs.pre.outputs.release }}'
+          recursive: true
+          timestamp-server: 'http://timestamp.digicert.com'
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
