@@ -63,7 +63,6 @@ jobs:
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
-      - uses: KamaranL/add-signtool-action@v1
       -
         run: choco install yq
       -
@@ -78,12 +77,18 @@ jobs:
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
           $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
+          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
 
           cd $prefix
           [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
-          signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
+          $signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
+        shell: pwsh
+      -
+        run: |
+          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
+          $prefix = "${{ needs.pre.outputs.release }}"
+          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
 
           cd (Split-Path -Path $prefix -Parent)
           Move-Item -Path "Release" -Destination "$repoName"
@@ -120,12 +125,18 @@ jobs:
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
           $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
+          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
 
           cd $prefix
           [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
-          signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
+          $signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
+        shell: pwsh
+      -
+        run: |
+          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
+          $prefix = "${{ needs.pre.outputs.release }}"
+          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
 
           cd (Split-Path -Path $prefix -Parent)
           Move-Item -Path "Release" -Destination "$repoName"
