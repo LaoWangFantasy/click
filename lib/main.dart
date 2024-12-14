@@ -4,6 +4,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'pages/theme.dart';
 import 'route.dart';
+// import 'connect.dart';
 
 
 void main() async {
@@ -15,8 +16,8 @@ void main() async {
       size: Size(300, 550),
       center: true,
       backgroundColor: Colors.transparent,
-      skipTaskbar: true,
-      titleBarStyle: TitleBarStyle.hidden,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.normal,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
@@ -29,6 +30,7 @@ void main() async {
 
 class ClickCore extends StatelessWidget {
   final String title;
+  final appTheme = const AppTheme();
 
   const ClickCore({super.key, required this.title});
 
@@ -37,6 +39,7 @@ class ClickCore extends StatelessWidget {
     return MaterialApp(
       title: title,
       debugShowCheckedModeBanner: false,
+      // home: ClickApp(appTheme: appTheme),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2C5364),

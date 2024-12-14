@@ -68,6 +68,7 @@ class _ClickAppState extends State<ClickApp> {
         backgroundColor: widget.appTheme.gradientMiddleColor,
         elevation: 10,
         type: BottomNavigationBarType.fixed,
+        
       ),
     );
   }
