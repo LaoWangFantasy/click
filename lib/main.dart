@@ -15,9 +15,10 @@ void main() async {
     const windowOptions = WindowOptions(
       size: Size(300, 550),
       center: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.greenAccent,
       skipTaskbar: true,
       titleBarStyle: TitleBarStyle.normal,
+      windowButtonVisibility: true,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();

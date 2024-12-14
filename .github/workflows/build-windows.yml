@@ -70,7 +70,7 @@ jobs:
           $bin= "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
 
           cd $prefix
-          Compress-Archive -Path .\* -DestinationPath $bin
+          Compress-Archive -Path .\ -DestinationPath $bin -CompressionLevel Optimal
           gh release upload ${{ needs.ready.outputs.version }} $bin --clobber
         shell: pwsh
         name: Upload(windows-legacy)
@@ -105,7 +105,7 @@ jobs:
           $bin= "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.zip"
 
           cd $prefix
-          Compress-Archive -Path .\* -DestinationPath $bin
-          gh release upload ${{ needs.ready.outputs.version }} $bin --clobber
+          Compress-Archive -Path .\ -DestinationPath $bin -CompressionLevel Optimal
+          gh release upload ${{ needs.ready.outputs.version }} $bin --clobber 
         shell: pwsh
         name: Upload(windows)
