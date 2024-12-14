@@ -2,6 +2,7 @@ name: build-windows
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  WINDOWS_PFX_PASSWD: ${{ secrets.WINDOWS_PFX_PASSWD }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "windows"
   RELEASE: "build/windows/x64/runner/Release"
@@ -28,6 +29,7 @@ jobs:
       pubspec: ${{ env.PUBSPEC }}
       target: ${{ env.TARGET }}
       release: ${{ env.RELEASE }}
+      pfx: ${{ env.WINDOWS_PFX_PASSWD }}
     steps:
       - run: echo "Bypass GitHub Action Restriction"
 
@@ -36,7 +38,7 @@ jobs:
       - pre
     uses: LaoWangFantasy/Flutter-Actions/.github/workflows/create-pfx.yml@master
     with:
-      pkcs12-secret: '${{ secrets.WINDOWS_PFX_PASSWD }}'
+      pkcs12-secret: ${{ needs.pre.outputs.pfx }}
 
   ready:
     needs:
