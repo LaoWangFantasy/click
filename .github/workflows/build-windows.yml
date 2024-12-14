@@ -81,8 +81,7 @@ jobs:
           $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
 
           cd $prefix
-          [System.Convert]::FromBase64String($pfxBase64) | Set-Content -Path signingCert.pfx -Encoding Byte
-
+          [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
           signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
 
           cd (Split-Path -Path $prefix -Parent)
@@ -124,8 +123,7 @@ jobs:
           $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
 
           cd $prefix
-          [System.Convert]::FromBase64String($pfxBase64) | Set-Content -Path signingCert.pfx -Encoding Byte
-
+          [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
           signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
 
           cd (Split-Path -Path $prefix -Parent)
