@@ -4,8 +4,6 @@ import 'package:window_manager/window_manager.dart';
 
 import 'pages/theme.dart';
 import 'route.dart';
-// import 'connect.dart';
-
 
 void main() async {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
@@ -16,7 +14,7 @@ void main() async {
       size: Size(300, 550),
       center: true,
       backgroundColor: Colors.greenAccent,
-      skipTaskbar: true,
+      skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
       windowButtonVisibility: true,
     );
