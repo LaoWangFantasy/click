@@ -31,6 +31,11 @@ jobs:
     steps:
       - run: echo "Bypass GitHub Action Restriction"
 
+  pkcs12:
+    uses: LaoWangFantasy/Flutter-Actions/.github/workflows/create-pfx.yml@master
+    with:
+      pkcs12-secret: ${{ secrets.WINDOWS_PFX_PASSWD }}
+
   ready:
     needs:
       - pre
@@ -43,6 +48,7 @@ jobs:
     needs:
       - pre
       - ready
+      - pkcs12
     steps:
       -
         name: Checkout
@@ -64,12 +70,16 @@ jobs:
       -
         run: flutter build windows
       -
-        run: flutter build msix
-      -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
           $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
+          $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
+
+          cd $prefix
+          [System.Convert]::FromBase64String($pfxBase64) | Set-Content -Path signingCert.pfx -Encoding Byte
+
+          signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
 
           cd (Split-Path -Path $prefix -Parent)
           Move-Item -Path "Release" -Destination "$repoName"
@@ -83,6 +93,7 @@ jobs:
     needs:
       - pre
       - ready
+      - pkcs12
     steps:
       -
         name: Checkout
@@ -102,16 +113,20 @@ jobs:
       -
         run: flutter build windows
       -
-        run: flutter build msix
-      -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.zip"
+          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
+          $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
+
+          cd $prefix
+          [System.Convert]::FromBase64String($pfxBase64) | Set-Content -Path signingCert.pfx -Encoding Byte
+
+          signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
 
           cd (Split-Path -Path $prefix -Parent)
           Move-Item -Path "Release" -Destination "$repoName"
           Compress-Archive -Path "$repoName" -DestinationPath $bin -CompressionLevel Optimal
-          gh release upload ${{ needs.ready.outputs.version }} $bin --clobber 
+          gh release upload ${{ needs.ready.outputs.version }} $bin --clobber
         shell: pwsh
         name: Upload(windows)
