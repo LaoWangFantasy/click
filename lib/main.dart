@@ -53,7 +53,7 @@ class ClickCore extends StatelessWidget {
         ],
       ),
       initialRoute: RouteManager.initialRoute,
-      onGenerateRoute: RouteManager.onGenerateRoute,
+      onGenerateRoute: RouteManager.onGenerateRoute
     );
   }
 }
