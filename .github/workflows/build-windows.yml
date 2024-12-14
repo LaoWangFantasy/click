@@ -78,11 +78,11 @@ jobs:
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
           $pfxBase64 = "${{ needs.pkcs12.outputs.pfx-base64 }}"
-          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe"
+          $signtool = "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool"
 
-          cd $prefix
+          cd $signtool
           [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
-          $signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $repoName.exe
+          signtool sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f "signingCert.pfx" /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $pfxBase64/$repoName.exe
         shell: pwsh
       -
         run: |
