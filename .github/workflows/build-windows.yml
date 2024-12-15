@@ -74,15 +74,6 @@ jobs:
       -
         run: flutter build windows
       -
-        run: flutter pub add --dev msix
-      -
-        run: |
-          # cd ${{ env.RELEASE }}a
-          # echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
-          # echo y | dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
-          echo y | dart run msix:create -b "CN=LaoWangFantasy Software, O=LaoWangFantasy Inc, C=US"
-        shell: bash
-      -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
@@ -93,4 +84,22 @@ jobs:
           Compress-Archive -Path "$repoName" -DestinationPath $bin -CompressionLevel Optimal
           gh release upload ${{ needs.ready.outputs.version }} $bin --clobber
         shell: pwsh
-        name: Upload(windows)
+        name: Upload(windows zip)
+      -
+        run: |
+          flutter pub add --dev msix
+          # echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
+          # echo y | dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
+          echo y | dart run msix:create -b "CN=LaoWangFantasy Software, O=LaoWangFantasy Inc, C=US"
+          shell: bash
+      -
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+          PREFIX="${{ needs.pre.outputs.release }}/$REPO_NAME.msix"
+          EXTENSION="${PREFIX##*.}"
+          BIN="$REPO_NAME-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.$EXTENSION"
+
+          mv $PREFIX $BIN
+          gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
+        shell: bash
+        name: Upload(windows msix)
