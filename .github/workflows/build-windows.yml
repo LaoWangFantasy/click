@@ -76,6 +76,8 @@ jobs:
       -
         run: flutter pub add --dev msix
       -
+        run: dart run msix:create
+      -
         run: |
           cd ${{ env.RELEASE }}
           echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
