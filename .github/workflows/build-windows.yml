@@ -76,7 +76,7 @@ jobs:
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           echo "${{ needs.pkcs12.outputs.pfx-base64 }}" | base64 -d > signingCert.pfx
-          "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /a /tr http://timestamp.digicert.com /fd SHA256 /td SHA256 /f signingCert.pfx /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $RELEASE/$REPO_NAME.exe
+          "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /debug /a /tr http://timestamp.digicert.com /fd SHA256 /td SHA256 /f signingCert.pfx /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $RELEASE/$REPO_NAME.exe
         shell: bash
       -
         run: |
