@@ -134,7 +134,7 @@ jobs:
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
           $prefix = "${{ needs.pre.outputs.release }}"
-          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
+          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.zip"
 
           cd (Split-Path -Path $prefix -Parent)
           Move-Item -Path "Release" -Destination "$repoName"
