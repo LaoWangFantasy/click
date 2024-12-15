@@ -74,19 +74,11 @@ jobs:
       -
         run: flutter build windows
       -
+        run: [System.IO.File]::WriteAllBytes("signingCert.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_PFX_BASE64 }}"))
+      -
         run: flutter pub add --dev msix
       -
-        run: dart run msix:create
-      -
-        uses: GabrielAcostaEngler/signtool-code-sign@main
-        with:
-          recursive: true
-          cert-description: 'LaoWangFantasy'
-          timestamp-server: 'http://timestamp.digicert.com'
-          certificate: '${{ secrets.WINDOWS_PFX_BASE64}}'
-          cert-sha1: '${{ secrets.WINDOWS_PFX_SHA }}'
-          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
-          folder: '${{ needs.pre.outputs.release }}'
+        run: dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
