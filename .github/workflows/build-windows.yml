@@ -3,6 +3,7 @@ name: build-windows
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   WINDOWS_PFX_PASSWD: ${{ secrets.WINDOWS_PFX_PASSWD }}
+  WINDOWS_PFX_BASE64: ${{ secrets.WINDOWS_PFX_BASE64 }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "windows"
   RELEASE: "build/windows/x64/runner/Release"
@@ -29,6 +30,7 @@ jobs:
       pubspec: ${{ env.PUBSPEC }}
       target: ${{ env.TARGET }}
       release: ${{ env.RELEASE }}
+      pfx-base64: ${{ env.WINDOWS_PFX_BASE64 }}
       pfx: ${{ env.WINDOWS_PFX_PASSWD }}
     steps:
       - run: echo "Bypass GitHub Action Restriction"
@@ -75,7 +77,7 @@ jobs:
         run: flutter build windows
       -
         run: |
-        [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String('${{ secrets.WINDOWS_PFX_BASE64 }}'))
+        [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String('${{ needs.pre.outputs.pfx-base64 }}'))
         shell: pwsh
       -
         run: flutter pub add --dev msix
