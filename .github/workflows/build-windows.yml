@@ -91,7 +91,7 @@ jobs:
           # echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
           # echo y | dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
           echo y | dart run msix:create -b "CN=LaoWangFantasy Software, O=LaoWangFantasy Inc, C=US"
-          shell: bash
+        shell: bash
       -
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
