@@ -126,8 +126,8 @@ jobs:
           recursive: true
           cert-description: 'foo'
           timestamp-server: 'http://timestamp.digicert.com'
-          certificate: '${{ needs.pkcs12.outputs.pfx-base64 }}'
-          cert-sha1: '${{ needs.pkcs12.outputs.pfx-sha1 }}'
+          certificate: '${{ secrets.WINDOWS_PFX_BASE64}}'
+          cert-sha1: '${{ secrets.WINDOWS_PFX_SHA }}'
           cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
           folder: '${{ needs.pre.outputs.release }}'
       -
