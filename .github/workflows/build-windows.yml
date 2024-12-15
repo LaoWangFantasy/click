@@ -2,7 +2,6 @@ name: build-windows
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  WINDOWS_PFX_PASSWD: ${{ secrets.WINDOWS_PFX_PASSWD }}
   PUBSPEC: "pubspec.yaml"
   TARGET: "windows"
   RELEASE: "build/windows/x64/runner/Release"
@@ -29,7 +28,6 @@ jobs:
       pubspec: ${{ env.PUBSPEC }}
       target: ${{ env.TARGET }}
       release: ${{ env.RELEASE }}
-      pfx: ${{ env.WINDOWS_PFX_PASSWD }}
     steps:
       - run: echo "Bypass GitHub Action Restriction"
 
@@ -37,8 +35,9 @@ jobs:
     needs:
       - pre
     uses: LaoWangFantasy/Flutter-Actions/.github/workflows/create-pfx.yml@master
-    with:
-      pkcs12-secret: ${{ needs.pre.outputs.pfx }}
+    secrets: inherit
+    # with:
+    #   pkcs12-secret: ${{ needs.pre.outputs.pfx }}
 
   ready:
     needs:
@@ -72,7 +71,13 @@ jobs:
       -
         run: flutter test
       -
-        run: flutter build windows
+        run: flutter build windows --release
+      -
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+          echo "${{ needs.pkcs12.outputs.pfx-base64 }}" | base64 -d > signingCert.pfx
+          "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /a /tr http://timestamp.digicert.com /fd SHA256 /td SHA256 /f signingCert.pfx /p "${{ secrets.WINDOWS_PFX_PASSWD }}" $REPO_NAME.exe
+        shell: bash
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
@@ -85,21 +90,21 @@ jobs:
           gh release upload ${{ needs.ready.outputs.version }} $bin --clobber
         shell: pwsh
         name: Upload(windows zip)
-      -
-        run: |
-          flutter pub add --dev msix
-          # echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
-          # echo y | dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
-          echo y | dart run msix:create -b "CN=LaoWangFantasy Software, O=LaoWangFantasy Inc, C=US"
-        shell: bash
-      -
-        run: |
-          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
-          PREFIX="${{ needs.pre.outputs.release }}/$REPO_NAME.msix"
-          EXTENSION="${PREFIX##*.}"
-          BIN="$REPO_NAME-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.$EXTENSION"
+      # -
+      #   run: |
+      #     flutter pub add --dev msix
+      #     # echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
+      #     # echo y | dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
+      #     echo y | dart run msix:create -b "CN=LaoWangFantasy Software, O=LaoWangFantasy Inc, C=US"
+      #   shell: bash
+      # -
+      #   run: |
+      #     REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
+      #     PREFIX="${{ needs.pre.outputs.release }}/$REPO_NAME.msix"
+      #     EXTENSION="${PREFIX##*.}"
+      #     BIN="$REPO_NAME-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}.$EXTENSION"
 
-          mv $PREFIX $BIN
-          gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
-        shell: bash
-        name: Upload(windows msix)
+      #     mv $PREFIX $BIN
+      #     gh release upload ${{ needs.ready.outputs.version }} $BIN --clobber
+      #   shell: bash
+      #   name: Upload(windows msix)
