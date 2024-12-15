@@ -82,6 +82,7 @@ jobs:
         run: flutter pub add --dev msix
       -
         run: dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }} --install-certificate true
+        shell: bash
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
