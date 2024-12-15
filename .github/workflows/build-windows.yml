@@ -74,12 +74,9 @@ jobs:
         run: flutter build windows --release
       -
         run: |
+          REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
           echo "${{ needs.pkcs12.outputs.pfx-base64 }}" | base64 -d > signingCert.pfx
-        shell: bash
-      -
-        run: |
-          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
-          "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f signingCert.pfx /p "${{ secrets.WINDOWS_PFX_PASSWD }}" ${{ needs.pre.outputs.release }}/$repoName.exe
+          "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /a /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 /f signingCert.pfx /p "${{ secrets.WINDOWS_PFX_PASSWD }}" ${{ needs.pre.outputs.release }}/$REPO_NAME.exe
         shell: bash
       -
         run: |
