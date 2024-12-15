@@ -76,29 +76,7 @@ jobs:
       -
         run: flutter pub add --dev msix
       -
-        run: |
-        Set-Content -Path "add.yaml" -Value @"
-        msix_config:   
-          display_name: $Env:GITHUB_REPOSITORY 
-          publisher_display_name: $Env:GITHUB_REPOSITORY
-          identity_name: company.suite.$Env:GITHUB_REPOSITORY
-          app_installer:
-            publish_folder_path: ${{ needs.pre.outputs.release }}
-            hours_between_update_checks: 0
-            automatic_background_task: true
-            update_blocks_activation: true
-            show_prompt: true
-            force_update_from_any_version: false
-          msix_version: ${{ needs.ready.outputs.version }}
-          logo_path: web/icons/Icon-512.png
-          capabilities: 
-            - internetClient
-        "@
-        Get-Content pubspec.yaml, add.yaml | Set-Content pubspec.yaml
-      -
         run: dart run msix:create
-      -
-        run: dart run msix:publish
       -
         uses: GabrielAcostaEngler/signtool-code-sign@main
         with:
