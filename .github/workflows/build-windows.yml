@@ -74,14 +74,11 @@ jobs:
       -
         run: flutter build windows
       -
-        run: |
-          $pfxBase64 = "${{ secrets.WINDOWS_PFX_BASE64 }}"
-          [IO.File]::WriteAllBytes('signingCert.pfx', [Convert]::FromBase64String("$pfxBase64"))
-        shell: pwsh
-      -
         run: flutter pub add --dev msix
       -
-        run: echo y | dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
+        run: |
+          echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
+          echo y | dart run msix:create -c "signingCert.pfx" -p ${{ secrets.WINDOWS_PFX_PASSWD }}
         shell: bash
       -
         run: |
