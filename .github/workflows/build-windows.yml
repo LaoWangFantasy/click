@@ -65,6 +65,12 @@ jobs:
       -
         run: choco install yq
       -
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/Delphier/SignTool/releases/download/v10.0.22621.6/SignTool-10.0.22621.6-x64.zip" -OutFile "SignTool\SignTool.zip"
+          Expand-Archive -Path "SignTool\SignTool.zip" -DestinationPath "SignTool"
+          ls SignTool
+        shell: pwsh
+      -
         run: flutter --version
       -
         run: flutter pub get
