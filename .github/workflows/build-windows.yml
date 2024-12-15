@@ -47,7 +47,7 @@ jobs:
     with:
       pub_path: ${{ needs.pre.outputs.pubspec }}
 
-  build-windows-legacy:
+  build-windows:
     runs-on: windows-2019
     needs:
       - pre
@@ -74,52 +74,31 @@ jobs:
       -
         run: flutter build windows
       -
-        uses: GabrielAcostaEngler/signtool-code-sign@main
-        with:
-          recursive: true
-          cert-description: 'LaoWangFantasy'
-          timestamp-server: 'http://timestamp.digicert.com'
-          certificate: '${{ secrets.WINDOWS_PFX_BASE64}}'
-          cert-sha1: '${{ secrets.WINDOWS_PFX_SHA }}'
-          cert-password: '${{ secrets.WINDOWS_PFX_PASSWD }}'
-          folder: '${{ needs.pre.outputs.release }}'
+        run: flutter pub add --dev msix
       -
         run: |
-          $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
-          $prefix = "${{ needs.pre.outputs.release }}"
-          $bin = "$repoName-${{ needs.ready.outputs.version }}-${{ needs.pre.outputs.target }}-legacy.zip"
-
-          cd (Split-Path -Path $prefix -Parent)
-          Move-Item -Path "Release" -Destination "$repoName"
-          Compress-Archive -Path "$repoName" -DestinationPath $bin -CompressionLevel Optimal
-          gh release upload ${{ needs.ready.outputs.version }} $bin --clobber
-        shell: pwsh
-        name: Upload(windows-legacy)
-
-  build-windows:
-    runs-on: windows-latest
-    needs:
-      - pre
-      - ready
-      - pkcs12
-    steps:
+        Set-Content -Path "add.yaml" -Value @"
+        msix_config:   
+          display_name: $Env:GITHUB_REPOSITORY 
+          publisher_display_name: $Env:GITHUB_REPOSITORY
+          identity_name: company.suite.$Env:GITHUB_REPOSITORY
+          app_installer:
+            publish_folder_path: ${{ needs.pre.outputs.release }}
+            hours_between_update_checks: 0
+            automatic_background_task: true
+            update_blocks_activation: true
+            show_prompt: true
+            force_update_from_any_version: false
+          msix_version: ${{ needs.ready.outputs.version }}
+          logo_path: web/icons/Icon-512.png
+          capabilities: 
+            - internetClient
+        "@
+        Get-Content pubspec.yaml, add.yaml | Set-Content pubspec.yaml
       -
-        name: Checkout
-        uses: actions/checkout@v4
+        run: dart run msix:create
       -
-        name: Set up Flutter
-        uses: subosito/flutter-action@v2.18.0
-        with:
-          channel: stable
-          flutter-version-file: pubspec.yaml
-      -
-        run: flutter --version
-      -
-        run: flutter pub get
-      -
-        run: flutter test
-      -
-        run: flutter build windows
+        run: dart run msix:publish
       -
         uses: GabrielAcostaEngler/signtool-code-sign@main
         with:
