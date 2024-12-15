@@ -77,7 +77,7 @@ jobs:
         uses: GabrielAcostaEngler/signtool-code-sign@main
         with:
           recursive: true
-          cert-description: 'foo'
+          cert-description: 'LaoWangFantasy'
           timestamp-server: 'http://timestamp.digicert.com'
           certificate: '${{ secrets.WINDOWS_PFX_BASE64}}'
           cert-sha1: '${{ secrets.WINDOWS_PFX_SHA }}'
@@ -124,7 +124,7 @@ jobs:
         uses: GabrielAcostaEngler/signtool-code-sign@main
         with:
           recursive: true
-          cert-description: 'foo'
+          cert-description: 'LaoWangFantasy'
           timestamp-server: 'http://timestamp.digicert.com'
           certificate: '${{ secrets.WINDOWS_PFX_BASE64}}'
           cert-sha1: '${{ secrets.WINDOWS_PFX_SHA }}'
