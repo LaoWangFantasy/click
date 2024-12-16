@@ -85,7 +85,7 @@ jobs:
       -
         run: |
           "SignTool\signtool.exe" sign /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com /a /f signingCert.pfx /p "${{ secrets.WINDOWS_PFX_PASSWD }}" ${{ needs.pre.outputs.release }}/click.exe
-        shell: pwsh
+        shell: bash
       -
         run: |
           $repoName = $Env:GITHUB_REPOSITORY -replace '^.+/', ''
