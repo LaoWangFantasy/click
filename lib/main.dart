@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'pages/theme.dart';
-import 'route.dart';
+import 'app.dart';
 
 void main() async {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
@@ -38,7 +38,7 @@ class ClickCore extends StatelessWidget {
     return MaterialApp(
       title: title,
       debugShowCheckedModeBanner: false,
-      // home: ClickApp(appTheme: appTheme),
+      home: ClickApp(appTheme: appTheme),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2C5364),
@@ -51,9 +51,7 @@ class ClickCore extends StatelessWidget {
         extensions: const <ThemeExtension<dynamic>>[
           AppTheme(),
         ],
-      ),
-      initialRoute: RouteManager.initialRoute,
-      onGenerateRoute: RouteManager.onGenerateRoute
+      )
     );
   }
 }
