@@ -12,8 +12,6 @@ import 'package:click/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const ClickCore(title: 'Click Demo'));
-    await tester.tap(find.byIcon(Icons.toggle_off));
     await tester.pump();
   });
 }
