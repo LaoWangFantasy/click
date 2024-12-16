@@ -60,17 +60,15 @@ class AppTheme extends ThemeExtension<AppTheme> {
     );
   }
 
-  static ThemeData get darkTheme => ThemeData(
+  ThemeData get darkTheme => ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2C5364),
+          seedColor: gradientEndColor, // Use the gradientEndColor as seed color
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
         textTheme: const TextTheme(
           bodyMedium: TextStyle(color: Colors.white),
         ),
-        extensions: const [
-          AppTheme()
-        ],
+        extensions: [this], // Add the current AppTheme instance as an extension
       );
 }

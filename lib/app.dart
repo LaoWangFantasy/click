@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'components/_bottom_app_bar.dart';
-import 'components/_bottom_floating_button.dart';
+import 'package:provider/provider.dart';
+import 'common/_bottom_app_bar.dart';
+import 'common/_bottom_floating_button.dart';
 
+import 'status/global.dart';
 import 'pages/dashboard.dart';
-import 'package:click/theme.dart';
+import 'pages/profile.dart';
 
 class ClickApp extends StatefulWidget {
   final String title;
-  final AppTheme appTheme;
-
-  const ClickApp({super.key, required this.title, required this.appTheme});
-
+  const ClickApp({super.key, required this.title});
   @override
   State<ClickApp> createState() => _ClickAppState();
 }
@@ -18,15 +17,35 @@ class ClickApp extends StatefulWidget {
 class _ClickAppState extends State<ClickApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: widget.title,
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: DashboardPage(title: "Click or Not", appTheme: widget.appTheme),
-          floatingActionButton: ClickBottomButton(appTheme: widget.appTheme),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          bottomNavigationBar: ClickBottomAppBar(appTheme: widget.appTheme),
-        ),
-        theme: AppTheme.darkTheme);
+    return Consumer<GlobalModel>(
+      builder: (ctx, g, _) {
+        final appTheme = g.theme;
+
+        return MaterialApp(
+          title: widget.title,
+          debugShowCheckedModeBanner: false,
+          theme: appTheme.darkTheme, // Use the theme dynamically
+          home: Scaffold(
+            body: _buildPage(ctx, g),
+            floatingActionButton: ClickBottomButton(),
+            floatingActionButtonLocation:FloatingActionButtonLocation.centerDocked,
+            bottomNavigationBar: ClickBottomAppBar(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+Widget _buildPage(BuildContext ctx, GlobalModel g) {
+  final index = g.selectedIndex;
+  final theme = g.theme;
+  switch (index) {
+    case 0:
+      return DashboardPage(title: "Dashboard", appTheme: theme);
+    case 1:
+      return ProfilePage(title: "Profile", appTheme: theme);
+    default:
+      return DashboardPage(title: "Dashboard", appTheme: theme);
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:click/status/global.dart';
-import 'package:click/theme.dart';
+import 'package:click/common/_theme.dart';
 
 class DashboardPage extends StatefulWidget {
   final String title;
@@ -52,9 +52,9 @@ class _DashboardPageState extends State<DashboardPage>
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
 
-    return Consumer<ClickModel>(
+    return Consumer<GlobalModel>(
       builder: (context, value, child) {
-        final isClicked = context.watch<ClickModel>().isActive();
+        final isClicked = context.watch<GlobalModel>().isActivate();
 
         // Trigger animation based on isClicked change
         if (isClicked && _animationController.status != AnimationStatus.forward) {
@@ -150,7 +150,7 @@ class _DashboardPageState extends State<DashboardPage>
                           ),
                           SizedBox(height: screenHeight * 0.02),
                           Text(
-                            isClicked ? 'Clicked' : 'UnClicked',
+                            isClicked ? 'Connected' : 'Disconnected',
                             style: TextStyle(
                               fontSize: screenWidth * 0.06,
                               color: isClicked
@@ -162,8 +162,8 @@ class _DashboardPageState extends State<DashboardPage>
                           SizedBox(height: screenHeight * 0.01),
                           Text(
                             isClicked
-                                ? 'The click status is true'
-                                : 'The click status is false',
+                                ? 'The connection status is true'
+                                : 'The connection status is false',
                             style: TextStyle(
                               fontSize: screenWidth * 0.04,
                               color: Colors.grey[300],
