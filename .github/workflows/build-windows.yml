@@ -80,7 +80,7 @@ jobs:
       -
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
-          echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > ./SignTool/signingCert.pfx
+          echo "${{ secrets.WINDOWS_PFX_BASE64 }}" | base64 -d > signingCert.pfx
         shell: bash
       -
         run: |

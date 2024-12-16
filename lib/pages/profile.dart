@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'theme.dart';
+import 'package:click/theme.dart';
 
 class ProfilePage extends StatelessWidget {
   final String title;

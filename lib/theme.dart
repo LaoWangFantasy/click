@@ -8,7 +8,7 @@ class AppTheme extends ThemeExtension<AppTheme> {
     this.selectedItemColor = Colors.blueAccent,
     this.unselectedItemColor = Colors.grey,
     this.disabledColor = const Color(0xFF787878),
-    this.shadowColor = Colors.black,
+    this.shadowColor = Colors.blueAccent,
   });
 
   final Color gradientStartColor;
@@ -50,8 +50,7 @@ class AppTheme extends ThemeExtension<AppTheme> {
           Color.lerp(gradientStartColor, other.gradientStartColor, t)!,
       gradientMiddleColor:
           Color.lerp(gradientMiddleColor, other.gradientMiddleColor, t)!,
-      gradientEndColor:
-          Color.lerp(gradientEndColor, other.gradientEndColor, t)!,
+      gradientEndColor: Color.lerp(gradientEndColor, other.gradientEndColor, t)!,
       selectedItemColor:
           Color.lerp(selectedItemColor, other.selectedItemColor, t)!,
       unselectedItemColor:
@@ -60,4 +59,18 @@ class AppTheme extends ThemeExtension<AppTheme> {
       shadowColor: Color.lerp(shadowColor, other.shadowColor, t)!,
     );
   }
+
+  static ThemeData get darkTheme => ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF2C5364),
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: Colors.white),
+        ),
+        extensions: const [
+          AppTheme()
+        ],
+      );
 }

@@ -1,29 +1,12 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
-
-import 'pages/theme.dart';
+import 'package:provider/provider.dart';
+import 'utils/init_window.dart';
+import 'status/global.dart';
+import 'theme.dart';
 import 'app.dart';
 
-void main() async {
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    WidgetsFlutterBinding.ensureInitialized();
-    await windowManager.ensureInitialized();
-
-    const windowOptions = WindowOptions(
-      size: Size(300, 550),
-      center: true,
-      backgroundColor: Colors.greenAccent,
-      skipTaskbar: true,
-      titleBarStyle: TitleBarStyle.normal,
-      windowButtonVisibility: true,
-    );
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
-  }
-
+void main() {
+  setupWindow();
   runApp(const ClickCore(title: 'Click Demo'));
 }
 
@@ -35,25 +18,11 @@ class ClickCore extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: title,
-      debugShowCheckedModeBanner: false,
-      home: ClickApp(appTheme: appTheme),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2C5364),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.white),
-        ),
-        extensions: const <ThemeExtension<dynamic>>[
-          AppTheme(),
-        ],
-      )
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ClickModel()),
+      ],
+      child: ClickApp(title: title, appTheme: appTheme)
     );
   }
 }
-
-
