@@ -18,17 +18,17 @@ class ProfilePage extends StatelessWidget {
 
 class ProfilePageBuilder {
   static Widget build(BuildContext ctx, GlobalModel g, String title) {
-    return _ProfilePageContent(title: title, globalModel: g);
+    return _ProfilePageContent(title: title, g: g);
   }
 }
 
 class _ProfilePageContent extends StatefulWidget {
   final String title;
-  final GlobalModel globalModel;
+  final GlobalModel g;
 
   const _ProfilePageContent({
     required this.title,
-    required this.globalModel,
+    required this.g,
   });
 
   @override
@@ -66,8 +66,8 @@ class _ProfilePageContentState extends State<_ProfilePageContent>
     final mediaQuery = MediaQuery.of(ctx);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    final theme = widget.globalModel.theme;
-    final isActive = widget.globalModel.isActivate;
+    final theme = widget.g.theme;
+    final isActive = widget.g.isActivate;
 
     if (isActive && _animationController.status != AnimationStatus.forward) {
       _animationController.forward();

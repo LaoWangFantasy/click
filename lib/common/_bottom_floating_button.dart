@@ -14,13 +14,13 @@ class ClickBottomButton extends StatelessWidget {
 }
 
 class ClickBottomButtonBuilder {
-  static Widget build(BuildContext context, GlobalModel globalModel) {
-    final isActive = globalModel.isActivate;
-    final appTheme = globalModel.theme;
+  static Widget build(BuildContext ctx, GlobalModel g) {
+    final isActive = g.isActivate;
+    final theme = g.theme;
 
     return FloatingActionButton(
-      onPressed: globalModel.toggleActivate,
-      backgroundColor: appTheme.selectedItemColor,
+      onPressed: g.toggleActivate,
+      backgroundColor: theme.selectedItemColor,
       shape: const CircleBorder(),
       elevation: 5.0,
       child: Icon(

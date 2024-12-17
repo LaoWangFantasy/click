@@ -14,21 +14,21 @@ class ClickBottomAppBar extends StatelessWidget {
 }
 
 class ClickBottomAppBarBuilder {
-  static Widget build(BuildContext context, GlobalModel globalModel) {
-    final theme = globalModel.theme;
+  static Widget build(BuildContext ctx, GlobalModel g) {
+    final theme = g.theme;
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 6.0,
       color: theme.gradientMiddleColor,
       elevation: 10,
       child: IconTheme(
-        data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
+        data: IconThemeData(color: Theme.of(ctx).colorScheme.onPrimary),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            _buildItem(context, globalModel, 0, Icons.dashboard, 'Dashboard'),
+            _buildItem(ctx, g, 0, Icons.dashboard, 'Dashboard'),
             const SizedBox(width: 50),
-            _buildItem(context, globalModel, 1, Icons.account_circle_sharp, 'Profile'),
+            _buildItem(ctx, g, 1, Icons.account_circle_sharp, 'Profile'),
           ],
         ),
       ),

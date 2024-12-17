@@ -16,18 +16,18 @@ class DashboardPage extends StatelessWidget {
 }
 
 class DashboardPageBuilder {
-  static Widget build(BuildContext context, GlobalModel globalModel, String title) {
-    return _DashboardPageContent(title: title, globalModel: globalModel);
+  static Widget build(BuildContext context, GlobalModel g, String title) {
+    return _DashboardPageContent(title: title, g: g);
   }
 }
 
 class _DashboardPageContent extends StatefulWidget {
   final String title;
-  final GlobalModel globalModel;
+  final GlobalModel g;
 
   const _DashboardPageContent({
     required this.title,
-    required this.globalModel,
+    required this.g,
   });
 
   @override
@@ -65,8 +65,8 @@ class _DashboardPageContentState extends State<_DashboardPageContent>
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    final theme = widget.globalModel.theme;
-    final isClicked = widget.globalModel.isActivate;
+    final theme = widget.g.theme;
+    final isClicked = widget.g.isActivate;
 
     if (isClicked && _animationController.status != AnimationStatus.forward) {
       _animationController.forward();
