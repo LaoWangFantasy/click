@@ -7,45 +7,45 @@ import 'status/global.dart';
 import 'pages/dashboard.dart';
 import 'pages/profile.dart';
 
-class ClickApp extends StatefulWidget {
+class ClickApp extends StatelessWidget {
   final String title;
-  const ClickApp({super.key, required this.title});
-  @override
-  State<ClickApp> createState() => _ClickAppState();
-}
 
-class _ClickAppState extends State<ClickApp> {
+  const ClickApp({super.key, required this.title});
+
   @override
   Widget build(BuildContext context) {
     return Consumer<GlobalModel>(
-      builder: (ctx, g, _) {
-        final appTheme = g.theme;
-
-        return MaterialApp(
-          title: widget.title,
-          debugShowCheckedModeBanner: false,
-          theme: appTheme.darkTheme, // Use the theme dynamically
-          home: Scaffold(
-            body: _buildPage(ctx, g),
-            floatingActionButton: ClickBottomButton(),
-            floatingActionButtonLocation:FloatingActionButtonLocation.centerDocked,
-            bottomNavigationBar: ClickBottomAppBar(),
-          ),
-        );
-      },
+      builder: (ctx, g, _) => ClickAppBuilder.build(ctx, g, title)
     );
   }
 }
 
-Widget _buildPage(BuildContext ctx, GlobalModel g) {
-  final index = g.selectedIndex;
-  final theme = g.theme;
+class ClickAppBuilder {
+  static Widget build(BuildContext ctx, GlobalModel g, String title) {
+    final theme = g.theme;
+    final index = g.selectedIndex;
+
+    return MaterialApp(
+      title: title,
+      debugShowCheckedModeBanner: false,
+      theme: theme.darkTheme,
+      home: Scaffold(
+        body: _buildPage(index),
+        floatingActionButton: ClickBottomButton(),
+        floatingActionButtonLocation:FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: ClickBottomAppBar(),
+      ),
+    );
+  }
+}
+
+Widget _buildPage(int index) {
   switch (index) {
     case 0:
-      return DashboardPage(title: "Dashboard", appTheme: theme);
+      return DashboardPage(title: "Dashboard");
     case 1:
-      return ProfilePage(title: "Profile", appTheme: theme);
+      return ProfilePage(title: "Profile");
     default:
-      return DashboardPage(title: "Dashboard", appTheme: theme);
+      return DashboardPage(title: "Dashboard");
   }
 }

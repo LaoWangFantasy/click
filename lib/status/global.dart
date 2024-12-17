@@ -8,6 +8,7 @@ class GlobalModel extends ChangeNotifier {
 
   AppTheme get theme => _theme;
   int get selectedIndex => _selectedIndex;
+  bool get isActivate => _isActivate;
 
   void toggleActivate() {
     _isActivate = !_isActivate;
@@ -19,16 +20,15 @@ class GlobalModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isActivate() {
-    return _isActivate;
-  }
   void setIndex(int index) {
     if (_selectedIndex != index) {
       _selectedIndex = index;
       notifyListeners();
     }
   }
+
   bool isSelected(int index) {
     return _selectedIndex == index;
   }
+
 }
