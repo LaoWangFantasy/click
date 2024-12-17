@@ -1,3 +1,6 @@
+.DS_Store
+.demo/*
+.vscode
 # Miscellaneous
 *.class
 *.log
